@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b0f19">
+
+  <title>Crypto Mine</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <div class="app">
+
+    <!-- HEADER -->
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">⛏️</div>
+        <div>
+          <h1>Crypto Mine</h1>
+          <span>Mining Adventure</span>
+        </div>
+      </div>
+
+      <button class="profile-btn">👤</button>
+    </header>
+
+
+    <!-- BALANCE -->
+    <section class="balance-card">
+
+      <p class="balance-label">YOUR BALANCE</p>
+
+      <div class="balance">
+        <span id="coins">0</span>
+        <span class="coin-symbol">🪙</span>
+      </div>
+
+      <div class="level">
+        <span>Level <b id="level">1</b></span>
+
+        <div class="progress">
+          <div id="progressBar"></div>
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- MINING AREA -->
+    <main class="mine-area">
+
+      <div class="mine-glow"></div>
+
+      <button id="mineButton" class="mine-button">
+        <span class="pickaxe">⛏️</span>
+        <span class="mine-text">MINE</span>
+      </button>
+
+      <p class="mine-hint">
+        Tap to start mining
+      </p>
+
+    </main>
+
+
+    <!-- ENERGY -->
+    <section class="energy-card">
+
+      <div class="energy-info">
+        <span>⚡ Energy</span>
+        <b>
+          <span id="energy">100</span>/100
+        </b>
+      </div>
+
+      <div class="energy-bar">
+        <div id="energyBar"></div>
+      </div>
+
+    </section>
+
+
+    <!-- STATS -->
+    <section class="stats">
+
+      <div class="stat-card">
+        <span>⛏️</span>
+        <small>Mining Power</small>
+        <strong id="power">1</strong>
+      </div>
+
+      <div class="stat-card">
+        <span>💰</span>
+        <small>Per Tap</small>
+        <strong id="perTap">1</strong>
+      </div>
+
+      <div class="stat-card">
+        <span>🔥</span>
+        <small>Streak</small>
+        <strong id="streak">0</strong>
+      </div>
+
+    </section>
+
+
+    <!-- ACTIONS -->
+    <section class="actions">
+
+      <button class="action-btn" id="rewardButton">
+        <span>🎁</span>
+        <b>Daily Reward</b>
+        <small>Claim</small>
+      </button>
+
+      <button class="action-btn" id="upgradeButton">
+        <span>🚀</span>
+        <b>Upgrade</b>
+        <small>Power</small>
+      </button>
+
+      <button class="action-btn" id="leaderboardButton">
+        <span>🏆</span>
+        <b>Leaderboard</b>
+        <small>Rank</small>
+      </button>
+
+    </section>
+
+
+    <!-- NAVIGATION -->
+    <nav class="bottom-nav">
+
+      <button class="nav-item active">
+        <span>⛏️</span>
+        <small>Mine</small>
+      </button>
+
+      <button class="nav-item">
+        <span>🎁</span>
+        <small>Rewards</small>
+      </button>
+
+      <button class="nav-item">
+        <span>🏆</span>
+        <small>Rank</small>
+      </button>
+
+      <button class="nav-item">
+        <span>⚙️</span>
+        <small>Settings</small>
+      </button>
+
+    </nav>
+
+  </div>
+
+
+  <script src="game.js"></script>
+
+</body>
+</html>
