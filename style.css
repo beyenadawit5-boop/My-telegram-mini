@@ -1,0 +1,601 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #070b14;
+  --card: #101725;
+  --card-light: #151e2e;
+  --text: #ffffff;
+  --muted: #8d98aa;
+  --accent: #00e5ff;
+  --accent-2: #7c4dff;
+  --success: #00e676;
+  --danger: #ff4d67;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background:
+    radial-gradient(circle at top, #14233d 0%, #070b14 45%);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+button {
+  font-family: inherit;
+  border: none;
+  cursor: pointer;
+  color: white;
+}
+
+.app {
+  width: 100%;
+  max-width: 520px;
+  min-height: 100vh;
+  margin: auto;
+  padding: 18px 16px 95px;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 15px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  font-size: 25px;
+
+  background: linear-gradient(
+    135deg,
+    var(--accent),
+    var(--accent-2)
+  );
+
+  box-shadow:
+    0 8px 30px rgba(0, 229, 255, 0.25);
+}
+
+.brand h1 {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.brand span {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.profile-btn {
+  width: 42px;
+  height: 42px;
+
+  border-radius: 14px;
+
+  background: var(--card);
+
+  border: 1px solid #202b3d;
+
+  font-size: 19px;
+}
+
+
+/* =========================
+   BALANCE CARD
+========================= */
+
+.balance-card {
+  padding: 22px;
+
+  border-radius: 24px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(21, 30, 46, 0.95),
+      rgba(10, 15, 27, 0.95)
+    );
+
+  border: 1px solid #202d43;
+
+  box-shadow:
+    0 15px 45px rgba(0, 0, 0, 0.25);
+
+  margin-bottom: 22px;
+}
+
+.balance-label {
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 2px;
+  font-weight: bold;
+}
+
+.balance {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  margin-top: 6px;
+
+  font-size: 38px;
+  font-weight: 900;
+}
+
+.coin-symbol {
+  font-size: 30px;
+}
+
+.level {
+  margin-top: 16px;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  font-size: 12px;
+}
+
+.level span {
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.level b {
+  color: white;
+}
+
+.progress {
+  flex: 1;
+  height: 7px;
+
+  border-radius: 20px;
+
+  background: #202a3b;
+  overflow: hidden;
+}
+
+#progressBar {
+  width: 0%;
+  height: 100%;
+
+  border-radius: inherit;
+
+  background:
+    linear-gradient(
+      90deg,
+      var(--accent),
+      var(--accent-2)
+    );
+
+  transition: width 0.3s ease;
+}
+
+
+/* =========================
+   MINING AREA
+========================= */
+
+.mine-area {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 270px;
+
+  margin-bottom: 18px;
+}
+
+.mine-glow {
+  position: absolute;
+
+  width: 190px;
+  height: 190px;
+
+  border-radius: 50%;
+
+  background: var(--accent);
+
+  filter: blur(90px);
+
+  opacity: 0.13;
+}
+
+
+/* MAIN MINING BUTTON */
+
+.mine-button {
+  position: relative;
+
+  width: 175px;
+  height: 175px;
+
+  border-radius: 50%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  background:
+    radial-gradient(
+      circle,
+      #1d3048 0%,
+      #101b2c 55%,
+      #0b111d 100%
+    );
+
+  border: 3px solid rgba(0, 229, 255, 0.35);
+
+  box-shadow:
+    0 0 0 10px rgba(0, 229, 255, 0.03),
+    0 0 50px rgba(0, 229, 255, 0.18),
+    inset 0 0 35px rgba(0, 229, 255, 0.08);
+
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.mine-button:active {
+  transform: scale(0.92);
+
+  box-shadow:
+    0 0 0 5px rgba(0, 229, 255, 0.05),
+    0 0 70px rgba(0, 229, 255, 0.35),
+    inset 0 0 40px rgba(0, 229, 255, 0.15);
+}
+
+.pickaxe {
+  font-size: 52px;
+
+  filter:
+    drop-shadow(0 0 12px rgba(255,255,255,0.2));
+
+  transition: transform 0.12s ease;
+}
+
+.mine-button:active .pickaxe {
+  transform: rotate(-18deg) scale(1.08);
+}
+
+.mine-text {
+  margin-top: 4px;
+
+  font-size: 14px;
+  font-weight: 900;
+
+  letter-spacing: 3px;
+
+  color: var(--accent);
+}
+
+.mine-hint {
+  margin-top: 15px;
+
+  color: var(--muted);
+
+  font-size: 12px;
+}
+
+
+/* =========================
+   ENERGY
+========================= */
+
+.energy-card {
+  padding: 16px;
+
+  border-radius: 18px;
+
+  background: var(--card);
+
+  border: 1px solid #202b3d;
+
+  margin-bottom: 15px;
+}
+
+.energy-info {
+  display: flex;
+  justify-content: space-between;
+
+  margin-bottom: 10px;
+
+  font-size: 13px;
+}
+
+.energy-info span {
+  color: var(--muted);
+}
+
+.energy-bar {
+  height: 8px;
+
+  border-radius: 20px;
+
+  overflow: hidden;
+
+  background: #222c3c;
+}
+
+#energyBar {
+  width: 100%;
+  height: 100%;
+
+  border-radius: inherit;
+
+  background:
+    linear-gradient(
+      90deg,
+      #00e676,
+      #00e5ff
+    );
+
+  transition: width 0.25s ease;
+}
+
+
+/* =========================
+   STATS
+========================= */
+
+.stats {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, 1fr);
+
+  gap: 9px;
+
+  margin-bottom: 15px;
+}
+
+.stat-card {
+  padding: 15px 8px;
+
+  border-radius: 18px;
+
+  text-align: center;
+
+  background: var(--card);
+
+  border: 1px solid #202b3d;
+}
+
+.stat-card span {
+  display: block;
+
+  font-size: 20px;
+
+  margin-bottom: 7px;
+}
+
+.stat-card small {
+  display: block;
+
+  color: var(--muted);
+
+  font-size: 9px;
+
+  margin-bottom: 5px;
+}
+
+.stat-card strong {
+  font-size: 16px;
+}
+
+
+/* =========================
+   ACTION BUTTONS
+========================= */
+
+.actions {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, 1fr);
+
+  gap: 9px;
+
+  margin-bottom: 20px;
+}
+
+.action-btn {
+  padding: 14px 6px;
+
+  border-radius: 18px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  background:
+    linear-gradient(
+      145deg,
+      #151f31,
+      #0e1522
+    );
+
+  border: 1px solid #243149;
+
+  transition: transform 0.15s ease;
+}
+
+.action-btn:active {
+  transform: scale(0.94);
+}
+
+.action-btn span {
+  font-size: 23px;
+
+  margin-bottom: 7px;
+}
+
+.action-btn b {
+  font-size: 10px;
+}
+
+.action-btn small {
+  color: var(--muted);
+
+  font-size: 8px;
+
+  margin-top: 4px;
+}
+
+
+/* =========================
+   BOTTOM NAV
+========================= */
+
+.bottom-nav {
+  position: fixed;
+
+  left: 50%;
+  bottom: 10px;
+
+  transform: translateX(-50%);
+
+  width: calc(100% - 28px);
+  max-width: 490px;
+
+  padding: 8px;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, 1fr);
+
+  gap: 5px;
+
+  border-radius: 22px;
+
+  background:
+    rgba(12, 18, 30, 0.94);
+
+  border: 1px solid #26334a;
+
+  backdrop-filter: blur(18px);
+
+  box-shadow:
+    0 15px 45px rgba(0,0,0,0.4);
+}
+
+.nav-item {
+  padding: 8px 4px;
+
+  border-radius: 15px;
+
+  background: transparent;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  gap: 4px;
+}
+
+.nav-item span {
+  font-size: 19px;
+}
+
+.nav-item small {
+  font-size: 9px;
+
+  color: var(--muted);
+}
+
+.nav-item.active {
+  background: rgba(0, 229, 255, 0.09);
+}
+
+.nav-item.active small {
+  color: var(--accent);
+}
+
+
+/* =========================
+   COIN POP ANIMATION
+========================= */
+
+.coin-pop {
+  position: fixed;
+
+  pointer-events: none;
+
+  font-size: 17px;
+  font-weight: bold;
+
+  color: #ffe066;
+
+  animation: coinPop 0.8s ease forwards;
+
+  z-index: 1000;
+}
+
+@keyframes coinPop {
+
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-75px) scale(1.3);
+  }
+
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 360px) {
+
+  .app {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .mine-button {
+    width: 155px;
+    height: 155px;
+  }
+
+  .balance {
+    font-size: 32px;
+  }
+
+  .stat-card {
+    padding: 12px 5px;
+  }
+
+  }
