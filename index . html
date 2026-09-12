@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0,
+        maximum-scale=1.0, user-scalable=no">
+
+  <title>Nova AI</title>
+
+  <!-- Telegram Mini App -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #0b0f19;
+      --card: #121826;
+      --card2: #182132;
+      --text: #ffffff;
+      --muted: #8994a7;
+      --accent: #2aabee;
+      --border: rgba(255,255,255,0.08);
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, sans-serif;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* APP */
+    .app {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* HEADER */
+    .header {
+      padding: 18px 18px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      background: rgba(11,15,25,0.95);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      width: 45px;
+      height: 45px;
+      border-radius: 14px;
+      background: linear-gradient(135deg,#2aabee,#6c5ce7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 23px;
+      box-shadow: 0 8px 25px rgba(42,171,238,0.25);
+    }
+
+    .brand h1 {
+      font-size: 19px;
+    }
+
+    .brand p {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 3px;
+    }
+
+    .status {
+      width: 10px;
+      height: 10px;
+      background: #36d399;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #36d399;
+    }
+
+    /* CHAT */
+    #chat {
+      flex: 1;
+      overflow-y: auto;
+      padding: 22px 15px 120px;
+      scroll-behavior: smooth;
+    }
+
+    .welcome {
+      text-align: center;
+      padding: 45px 20px 25px;
+    }
+
+    .welcome-icon {
+      width: 75px;
+      height: 75px;
+      margin: auto;
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 38px;
+      background: linear-gradient(135deg,#2aabee,#6c5ce7);
+      box-shadow: 0 15px 40px rgba(42,171,238,.25);
+    }
+
+    .welcome h2 {
+      margin-top: 20px;
+      font-size: 25px;
+    }
+
+    .welcome p {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* QUICK BUTTONS */
+    .quick {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      max-width: 430px;
+      margin: 20px auto;
+    }
+
+    .quick button {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 13px 8px;
+      border-radius: 14px;
+      font-size: 13px;
+    }
+
+    .quick button:active {
+      transform: scale(.97);
+      background: var(--card2);
+    }
+
+    /* MESSAGE */
+    .message {
+      display: flex;
+      margin: 12px 0;
+      animation: appear .2s ease;
+    }
+
+    @keyframes appear {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .message.user {
+      justify-content: flex-end;
+    }
+
+    .bubble {
+      max-width: 82%;
+      padding: 12px 15px;
+      border-radius: 18px;
+      font-size: 15px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    .bot .bubble {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 5px;
+    }
+
+    .user .bubble {
+      background: linear-gradient(135deg,#229ed9,#187bb5);
+      border-bottom-right-radius: 5px;
+    }
+
+    /* TYPING */
+    .typing {
+      display: none;
+      align-items: center;
+      gap: 5px;
+      width: fit-content;
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 12px 16px;
+      border-radius: 17px;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      background: #9aa6ba;
+      border-radius: 50%;
+      animation: bounce 1s infinite;
+    }
+
+    .dot:nth-child(2) {
+      animation-delay: .15s;
+    }
+
+    .dot:nth-child(3) {
+      animation-delay: .3s;
+    }
+
+    @keyframes bounce {
+      0%, 60%, 100% {
+        transform: translateY(0);
+      }
+      30% {
+        transform: translateY(-5px);
+      }
+    }
+
+    /* INPUT */
+    .input-wrapper {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+      background: linear-gradient(
+        transparent,
+        var(--bg) 25%
+      );
+    }
+
+    .input-area {
+      max-width: 650px;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 7px;
+      border-radius: 20px;
+      box-shadow: 0 -5px 25px rgba(0,0,0,.2);
+    }
+
+    #messageInput {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: white;
+      font-size: 15px;
+      padding: 11px 10px;
+    }
+
+    #messageInput::placeholder {
+      color: #687386;
+    }
+
+    #sendBtn {
+      width: 43px;
+      height: 43px;
+      border: none;
+      border-radius: 14px;
+      background: linear-gradient(135deg,#2aabee,#187bb5);
+      color: white;
+      font-size: 19px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #sendBtn:active {
+      transform: scale(.92);
+    }
+
+    /* USER */
+    .user-info {
+      text-align: center;
+      color: var(--muted);
+      font-size: 11px;
+      padding-top: 5px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- HEADER -->
+  <header class="header">
+
+    <div class="brand">
+
+      <div class="logo">
+        🤖
+      </div>
+
+      <div>
+        <h1>Nova AI</h1>
+        <p>AI Assistant • Online</p>
+      </div>
+
+    </div>
+
+    <div class="status"></div>
+
+  </header>
+
+
+  <!-- CHAT -->
+  <main id="chat">
+
+    <div class="welcome">
+
+      <div class="welcome-icon">
+        ✨
+      </div>
+
+      <h2>Hello 👋</h2>
+
+      <p>
+        I'm Nova AI.<br>
+        Ask me anything and I'll try to help.
+      </p>
+
+      <div class="quick">
+
+        <button onclick="quickMessage('Explain something to me')">
+          💡 Explain
+        </button>
+
+        <button onclick="quickMessage('Help me write something')">
+          ✍️ Writing
+        </button>
+
+        <button onclick="quickMessage('Help me learn coding')">
+          💻 Coding
+        </button>
+
+        <button onclick="quickMessage('Give me an idea')">
+          🚀 Ideas
+        </button>
+
+      </div>
+
+      <div class="user-info" id="userInfo">
+        Telegram Mini App
+      </div>
+
+    </div>
+
+    <!-- TYPING -->
+    <div class="message bot" id="typingMessage">
+
+      <div class="typing" style="display:flex">
+
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+
+      </div>
+
+    </div>
+
+  </main>
+
+
+  <!-- INPUT -->
+  <div class="input-wrapper">
+
+    <div class="input-area">
+
+      <input
+        id="messageInput"
+        type="text"
+        placeholder="Ask Nova AI..."
+        autocomplete="off"
+      >
+
+      <button id="sendBtn">
+        ➤
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+  // Telegram
+  const tg = window.Telegram.WebApp;
+
+  tg.ready();
+  tg.expand();
+
+
+  // Elements
+  const chat = document.getElementById("chat");
+  const input = document.getElementById("messageInput");
+  const sendBtn = document.getElementById("sendBtn");
+  const userInfo = document.getElementById("userInfo");
+
+
+  // Telegram user
+  if (tg.initDataUnsafe &&
+      tg.initDataUnsafe.user) {
+
+    const user = tg.initDataUnsafe.user;
+
+    userInfo.innerText =
+      "Welcome, " +
+      (user.first_name || "User") +
+      " 👋";
+
+  }
+
+
+  // Add message
+  function addMessage(text, type) {
+
+    const message = document.createElement("div");
+
+    message.className =
+      "message " + type;
+
+    const bubble =
+      document.createElement("div");
+
+    bubble.className = "bubble";
+
+    bubble.textContent = text;
+
+    message.appendChild(bubble);
+
+    chat.insertBefore(
+      message,
+      document.getElementById("typingMessage")
+    );
+
+    chat.scrollTop = chat.scrollHeight;
+  }
+
+
+  // Typing
+  function showTyping() {
+
+    document.getElementById(
+      "typingMessage"
+    ).style.display = "flex";
+
+    chat.scrollTop = chat.scrollHeight;
+  }
+
+
+  function hideTyping() {
+
+    document.getElementById(
+      "typingMessage"
+    ).style.display = "none";
+
+  }
+
+
+  // Send
+  function sendMessage() {
+
+    const text =
+      input.value.trim();
+
+    if (!text) return;
+
+    addMessage(text, "user");
+
+    input.value = "";
+
+    tg.HapticFeedback.impactOccurred("light");
+
+    showTyping();
+
+
+    // Temporary AI response
+    setTimeout(function() {
+
+      hideTyping();
+
+      addMessage(
+        "🤖 I received your message!\n\n" +
+        "This Mini App is ready. " +
+        "The next step is connecting Nova AI to Gemini API so I can generate real AI answers.",
+        "bot"
+      );
+
+    }, 900);
+
+  }
+
+
+  // Quick buttons
+  function quickMessage(text) {
+
+    input.value = text;
+
+    sendMessage();
+
+  }
+
+
+  // Events
+  sendBtn.addEventListener(
+    "click",
+    sendMessage
+  );
+
+
+  input.addEventListener(
+    "keydown",
+    function(event) {
+
+      if (event.key === "Enter") {
+        sendMessage();
+      }
+
+    }
+  );
+
+</script>
+
+</body>
+</html>https://telegram.org/js/telegram-web-app.js
