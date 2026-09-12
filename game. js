@@ -1,0 +1,606 @@
+// ==========================================
+// CRYPTO MINE ⛏️
+// Telegram Mini App Mining Game
+// ==========================================
+
+// ---------- GAME DATA ----------
+
+let coins = Number(localStorage.getItem("coins")) || 0;
+let energy = Number(localStorage.getItem("energy")) || 100;
+let level = Number(localStorage.getItem("level")) || 1;
+let power = Number(localStorage.getItem("power")) || 1;
+let streak = Number(localStorage.getItem("streak")) || 0;
+let lastReward = localStorage.getItem("lastReward") || "";
+
+const MAX_ENERGY = 100;
+
+
+// ---------- ELEMENTS ----------
+
+const coinsEl = document.getElementById("coins");
+const energyEl = document.getElementById("energy");
+const levelEl = document.getElementById("level");
+const powerEl = document.getElementById("power");
+const perTapEl = document.getElementById("perTap");
+const streakEl = document.getElementById("streak");
+
+const energyBar = document.getElementById("energyBar");
+const progressBar = document.getElementById("progressBar");
+
+const mineButton = document.getElementById("mineButton");
+const rewardButton = document.getElementById("rewardButton");
+const upgradeButton = document.getElementById("upgradeButton");
+const leaderboardButton = document.getElementById("leaderboardButton");
+
+
+// ---------- TELEGRAM MINI APP ----------
+
+const tg = window.Telegram?.WebApp;
+
+if (tg) {
+    tg.ready();
+    tg.expand();
+
+    // Match Telegram theme
+    if (tg.setHeaderColor) {
+        tg.setHeaderColor("#070b14");
+    }
+
+    if (tg.setBackgroundColor) {
+        tg.setBackgroundColor("#070b14");
+    }
+}
+
+
+// ---------- SAVE GAME ----------
+
+function saveGame() {
+
+    localStorage.setItem("coins", coins);
+    localStorage.setItem("energy", energy);
+    localStorage.setItem("level", level);
+    localStorage.setItem("power", power);
+    localStorage.setItem("streak", streak);
+    localStorage.setItem("lastReward", lastReward);
+}
+
+
+// ---------- LEVEL SYSTEM ----------
+
+function coinsNeededForNextLevel() {
+
+    return level * 100;
+}
+
+
+function updateLevel() {
+
+    const required = coinsNeededForNextLevel();
+
+    const previousLevel = level;
+
+    level = Math.floor(coins / 100) + 1;
+
+    if (level < 1) {
+        level = 1;
+    }
+
+    if (level > previousLevel) {
+
+        streak += 1;
+
+        showMessage(
+            "🎉 Level Up!",
+            "You reached Level " + level
+        );
+
+        if (tg && tg.HapticFeedback) {
+            tg.HapticFeedback.notificationOccurred("success");
+        }
+    }
+}
+
+
+// ---------- UPDATE UI ----------
+
+function updateUI() {
+
+    coinsEl.textContent = formatNumber(coins);
+
+    energyEl.textContent = energy;
+
+    levelEl.textContent = level;
+
+    powerEl.textContent = power;
+
+    perTapEl.textContent = power;
+
+    streakEl.textContent = streak;
+
+
+    // Energy progress
+
+    const energyPercent =
+        (energy / MAX_ENERGY) * 100;
+
+    energyBar.style.width =
+        energyPercent + "%";
+
+
+    // Level progress
+
+    const currentLevelCoins =
+        (level - 1) * 100;
+
+    const nextLevelCoins =
+        level * 100;
+
+    const levelProgress =
+        ((coins - currentLevelCoins) /
+        (nextLevelCoins - currentLevelCoins)) * 100;
+
+    progressBar.style.width =
+        Math.max(0, Math.min(100, levelProgress)) + "%";
+
+
+    // Disable mining when energy is empty
+
+    if (energy <= 0) {
+
+        mineButton.style.opacity = "0.5";
+
+        mineButton.style.pointerEvents = "none";
+
+        document.querySelector(".mine-hint").textContent =
+            "⚡ Energy empty — wait for recharge";
+
+    } else {
+
+        mineButton.style.opacity = "1";
+
+        mineButton.style.pointerEvents = "auto";
+
+        document.querySelector(".mine-hint").textContent =
+            "Tap to start mining";
+    }
+
+
+    saveGame();
+}
+
+
+// ---------- NUMBER FORMAT ----------
+
+function formatNumber(number) {
+
+    if (number >= 1000000000) {
+        return (number / 1000000000).toFixed(2) + "B";
+    }
+
+    if (number >= 1000000) {
+        return (number / 1000000).toFixed(2) + "M";
+    }
+
+    if (number >= 1000) {
+        return (number / 1000).toFixed(2) + "K";
+    }
+
+    return Math.floor(number);
+}
+
+
+// ---------- MINING ----------
+
+function mine() {
+
+    if (energy <= 0) {
+        return;
+    }
+
+
+    // Add coins
+
+    coins += power;
+
+
+    // Use energy
+
+    energy -= 1;
+
+
+    // Increase streak
+
+    streak += 1;
+
+
+    // Check level
+
+    updateLevel();
+
+
+    // Visual coin animation
+
+    createCoinAnimation();
+
+
+    // Telegram vibration
+
+    if (tg && tg.HapticFeedback) {
+
+        tg.HapticFeedback.impactOccurred("light");
+    }
+
+
+    updateUI();
+}
+
+
+// ---------- COIN ANIMATION ----------
+
+function createCoinAnimation() {
+
+    const coin = document.createElement("div");
+
+    coin.className = "coin-pop";
+
+    coin.textContent = "+" + power + " 🪙";
+
+
+    const rect =
+        mineButton.getBoundingClientRect();
+
+
+    coin.style.left =
+        (rect.left + rect.width / 2 - 25) + "px";
+
+
+    coin.style.top =
+        (rect.top + rect.height / 2 - 10) + "px";
+
+
+    document.body.appendChild(coin);
+
+
+    setTimeout(() => {
+
+        coin.remove();
+
+    }, 800);
+}
+
+
+// ---------- ENERGY RECHARGE ----------
+
+setInterval(() => {
+
+    if (energy < MAX_ENERGY) {
+
+        energy += 1;
+
+        updateUI();
+    }
+
+}, 3000);
+
+
+// ---------- DAILY REWARD ----------
+
+function claimDailyReward() {
+
+    const today =
+        new Date().toISOString().split("T")[0];
+
+
+    if (lastReward === today) {
+
+        showMessage(
+            "🎁 Already Claimed",
+            "Come back tomorrow for another reward!"
+        );
+
+        return;
+    }
+
+
+    const reward =
+        100 + (level * 25);
+
+
+    coins += reward;
+
+    energy = Math.min(
+        MAX_ENERGY,
+        energy + 30
+    );
+
+
+    lastReward = today;
+
+
+    showMessage(
+        "🎉 Reward Claimed!",
+        "+" + reward + " 🪙 added to your balance"
+    );
+
+
+    if (tg && tg.HapticFeedback) {
+
+        tg.HapticFeedback.notificationOccurred(
+            "success"
+        );
+    }
+
+
+    updateLevel();
+
+    updateUI();
+}
+
+
+// ---------- UPGRADE ----------
+
+function upgradeMining() {
+
+    const upgradeCost =
+        level * 100;
+
+
+    if (coins < upgradeCost) {
+
+        showMessage(
+            "❌ Not Enough Coins",
+            "You need " +
+            upgradeCost +
+            " 🪙 to upgrade."
+        );
+
+        return;
+    }
+
+
+    coins -= upgradeCost;
+
+
+    power += 1;
+
+
+    showMessage(
+        "🚀 Upgrade Successful!",
+        "Mining Power is now " + power
+    );
+
+
+    if (tg && tg.HapticFeedback) {
+
+        tg.HapticFeedback.notificationOccurred(
+            "success"
+        );
+    }
+
+
+    updateUI();
+}
+
+
+// ---------- LEADERBOARD ----------
+
+function openLeaderboard() {
+
+    showMessage(
+        "🏆 Leaderboard",
+        "Leaderboard system will be connected soon!"
+    );
+}
+
+
+// ---------- CUSTOM MESSAGE ----------
+
+function showMessage(title, message) {
+
+    const overlay =
+        document.createElement("div");
+
+
+    overlay.style.position = "fixed";
+    overlay.style.inset = "0";
+
+    overlay.style.background =
+        "rgba(0,0,0,0.65)";
+
+    overlay.style.display =
+        "flex";
+
+    overlay.style.alignItems =
+        "center";
+
+    overlay.style.justifyContent =
+        "center";
+
+    overlay.style.zIndex =
+        "9999";
+
+
+    const box =
+        document.createElement("div");
+
+
+    box.style.width =
+        "calc(100% - 50px)";
+
+    box.style.maxWidth =
+        "360px";
+
+    box.style.padding =
+        "25px";
+
+    box.style.borderRadius =
+        "24px";
+
+    box.style.background =
+        "#101725";
+
+    box.style.border =
+        "1px solid #26334a";
+
+    box.style.textAlign =
+        "center";
+
+    box.style.boxShadow =
+        "0 20px 60px rgba(0,0,0,0.5)";
+
+
+    box.innerHTML = `
+
+        <div style="
+            font-size:38px;
+            margin-bottom:12px;
+        ">
+            ⛏️
+        </div>
+
+        <h2 style="
+            margin-bottom:8px;
+            font-size:20px;
+        ">
+            ${title}
+        </h2>
+
+        <p style="
+            color:#8d98aa;
+            font-size:13px;
+            line-height:1.5;
+            margin-bottom:20px;
+        ">
+            ${message}
+        </p>
+
+        <button id="closeMessage"
+            style="
+                width:100%;
+                padding:13px;
+                border-radius:14px;
+                background:
+                linear-gradient(
+                    135deg,
+                    #00e5ff,
+                    #7c4dff
+                );
+                color:white;
+                font-weight:bold;
+                font-size:14px;
+            ">
+            OK
+        </button>
+    `;
+
+
+    overlay.appendChild(box);
+
+    document.body.appendChild(overlay);
+
+
+    document
+        .getElementById("closeMessage")
+        .addEventListener(
+            "click",
+            () => overlay.remove()
+        );
+}
+
+
+// ---------- BUTTON EVENTS ----------
+
+mineButton.addEventListener(
+    "click",
+    mine
+);
+
+
+rewardButton.addEventListener(
+    "click",
+    claimDailyReward
+);
+
+
+upgradeButton.addEventListener(
+    "click",
+    upgradeMining
+);
+
+
+leaderboardButton.addEventListener(
+    "click",
+    openLeaderboard
+);
+
+
+// ---------- NAVIGATION ----------
+
+const navItems =
+    document.querySelectorAll(".nav-item");
+
+
+navItems.forEach((item) => {
+
+    item.addEventListener("click", () => {
+
+        navItems.forEach((nav) => {
+
+            nav.classList.remove("active");
+
+        });
+
+
+        item.classList.add("active");
+
+
+        const label =
+            item.querySelector("small").textContent;
+
+
+        if (label === "Rewards") {
+
+            claimDailyReward();
+
+        }
+
+
+        if (label === "Rank") {
+
+            openLeaderboard();
+
+        }
+
+
+        if (label === "Settings") {
+
+            showMessage(
+                "⚙️ Settings",
+                "Settings panel will be added soon."
+            );
+
+        }
+
+    });
+
+});
+
+
+// ---------- AUTO SAVE ----------
+
+setInterval(() => {
+
+    saveGame();
+
+}, 5000);
+
+
+// ---------- START GAME ----------
+
+updateLevel();
+
+updateUI();
+
+console.log(
+    "⛏️ Crypto Mine started successfully!"
+);window.Telegram?.WebApp;
